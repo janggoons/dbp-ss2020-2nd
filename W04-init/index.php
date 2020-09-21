@@ -1,11 +1,11 @@
 <?php
-  $link = mysqli_connect('localhost','root','rootroot','dbp');
+  $link = mysqli_connect('localhost', 'root', 'rootroot', 'dbp');
   $query = "SELECT * FROM topic";
   $result = mysqli_query($link, $query);
   $list ='';
   while ($row = mysqli_fetch_array($result)) {
-    $escaped_title = htmlspecialchars($row['title']);
-    $list = $list."<li><a href=\"index.php?id={$row['id']}\">{$escaped_title}</a></li>";
+      $escaped_title = htmlspecialchars($row['title']);
+      $list = $list."<li><a href=\"index.php?id={$row['id']}\">{$escaped_title}</a></li>";
   }
 
   $article = array(
@@ -14,18 +14,24 @@
   );
 
   $update_link = '';
+  $delete_link = '';
 
-  if( isset($_GET['id'])) {
-    $filtered_id = mysqli_real_escape_string($link, $_GET['id']);
-    $query = "SELECT * FROM topic WHERE id={$filtered_id}";
-    $result = mysqli_query($link, $query);
-    $row = mysqli_fetch_array($result);
-    $article['title'] = htmlspecialchars($row['title']);
-    $article['description'] = htmlspecialchars($row['description']);
+  if (isset($_GET['id'])) {
+      $filtered_id = mysqli_real_escape_string($link, $_GET['id']);
+      $query = "SELECT * FROM topic WHERE id={$filtered_id}";
+      $result = mysqli_query($link, $query);
+      $row = mysqli_fetch_array($result);
+      $article['title'] = htmlspecialchars($row['title']);
+      $article['description'] = htmlspecialchars($row['description']);
 
-    $update_link = '<a href="update.php?id='.$_GET['id'].'">update</a>';
+      $update_link = '<a href="update.php?id='.$_GET['id'].'">update</a>';
+      $delete_link = '
+        <form action="process_delete.php" method="post">
+          <input type="hidden" name="id" value="'.$_GET['id'].'">
+          <input type="submit" value="delete">
+        </form>
+      ';
   }
-
  ?>
 
 <!DOCTYPE html>
@@ -39,6 +45,7 @@
     <ol><?= $list ?></ol>
     <a href="create.php">create</a>
     <?= $update_link ?>
+    <?= $delete_link ?>
     <h2><?= $article['title'] ?></h2>
     <?= $article['description'] ?>
   </body>
